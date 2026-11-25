@@ -518,6 +518,354 @@ async function findRoute(){
 </script>
 </section>
  
+<section id="br-extra">
+<style>
+#br-extra {
+  font-family: Arial, sans-serif;
+  background: #f1f5fa;
+  padding: 18px;
+  color: #172033;
+  border-radius: 14px;
+}
+#br-extra .card {
+  background: white;
+  padding: 16px;
+  margin: 14px 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0001;
+}
+#br-extra input,
+#br-extra select,
+#br-extra textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin: 7px 0 13px;
+  border: 1px solid #ccd3df;
+  border-radius: 8px;
+}
+#br-extra button {
+  background: #1456c0;
+  color: white;
+  border: 0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 4px;
+}
+#br-extra .wide {width:100%}
+#br-extra .danger {background:#d62828}
+#br-extra .stars button {background:#e5e7eb;color:#172033}
+#br-extra .stars button.selected {background:#f5b400;color:white}
+#br-extra [hidden] {display:none!important}
+#br-extra .small {font-size:12px;color:#687386}
+</style>
+
+<h2>BR Cab – Driver & Safety</h2>
+
+<div class="card">
+<h3>🚘 Driver Registration</h3>
+
+<label>Full Name</label>
+<input id="br3-name" placeholder="Driver name">
+
+<label>Age</label>
+<input id="br3-age" type="number" min="18" placeholder="Age">
+
+<label>Mobile Number</label>
+<input id="br3-phone" type="tel" maxlength="10" placeholder="10 digit number">
+
+<label>Driver Photo</label>
+<input id="br3-photo" type="file" accept="image/*">
+
+<label>Driving Licence</label>
+<input id="br3-dl" type="file" accept="image/*,.pdf">
+
+<label>PAN Card</label>
+<input id="br3-pan" type="file" accept="image/*,.pdf">
+
+<label>Vehicle RC</label>
+<input id="br3-rc" type="file" accept="image/*,.pdf">
+
+<label>Vehicle Number</label>
+<input id="br3-number" placeholder="Vehicle registration number">
+
+<label>Vehicle Model</label>
+<input id="br3-model" placeholder="Car model">
+
+<label>Vehicle Colour</label>
+<input id="br3-colour" placeholder="Vehicle colour">
+
+<label>Vehicle Photo</label>
+<input id="br3-vehicle-photo" type="file" accept="image/*">
+
+<button class="wide" onclick="br3Register()">Submit Registration</button>
+<p id="br3-register-message"></p>
+
+<p class="small">
+Registration is only a frontend demonstration.
+Secure document upload and verification require a protected backend.
+</p>
+</div>
+
+<div class="card">
+<h3>🟢 Driver Availability</h3>
+<select id="br3-status">
+<option value="offline">Offline</option>
+<option value="online">Online</option>
+</select>
+<button onclick="br3Status()">Update Status</button>
+<p id="br3-status-message"></p>
+</div>
+
+<div class="card">
+<h3>⭐ Customer Rating</h3>
+<p>Rate your driver</p>
+<div class="stars">
+<button onclick="br3Star(1)">1 ★</button>
+<button onclick="br3Star(2)">2 ★</button>
+<button onclick="br3Star(3)">3 ★</button>
+<button onclick="br3Star(4)">4 ★</button>
+<button onclick="br3Star(5)">5 ★</button>
+</div>
+<p id="br3-rating"></p>
+
+<textarea id="br3-review" placeholder="Write your review"></textarea>
+<button class="wide" onclick="br3Review()">Submit Review</button>
+<p id="br3-review-message"></p>
+</div>
+
+<div class="card">
+<h3>📢 Customer Complaint</h3>
+
+<label>Complaint Category</label>
+<select id="br3-category">
+<option>Driver Behaviour</option>
+<option>Vehicle Problem</option>
+<option>Payment Problem</option>
+<option>Safety Issue</option>
+<option>Booking Problem</option>
+<option>Other</option>
+</select>
+
+<textarea id="br3-complaint" placeholder="Describe your complaint"></textarea>
+
+<button class="wide" onclick="br3Complaint()">Submit Complaint</button>
+<p id="br3-complaint-message"></p>
+</div>
+
+<div class="card">
+<h3>🆘 Emergency SOS</h3>
+<p>If you are in danger, contact emergency services immediately.</p>
+<button class="danger wide" onclick="br3SOS()">SOS EMERGENCY</button>
+<p id="br3-sos-message"></p>
+</div>
+
+<div class="card">
+<h3>📋 Booking History</h3>
+<p id="br3-history">Your booking history will appear here after backend integration.</p>
+</div>
+
+<div class="card">
+<h3>☎️ Customer Support</h3>
+<p>BR Cab Help & Support</p>
+<p>Contact support through the official support channel.</p>
+</div>
+
+<script>
+(function() {
+let selectedRating = 0;
+
+window.br3Register = function() {
+  const name = document.getElementById("br3-name").value.trim();
+  const age = Number(document.getElementById("br3-age").value);
+  const phone = document.getElementById("br3-phone").value.trim();
+
+  const files = [
+    "br3-photo","br3-dl","br3-pan",
+    "br3-rc","br3-vehicle-photo"
+  ];
+
+  if (!name || age < 18 || !/^[0-9]{10}$/.test(phone)) {
+    document.getElementById("br3-register-message").textContent =
+      "Enter valid name, age (18+) and mobile number.";
+    return;
+  }
+
+  if (!files.every(id => document.getElementById(id).files.length)) {
+    document.getElementById("br3-register-message").textContent =
+      "Please select all required documents and photos.";
+    return;
+  }
+
+  document.getElementById("br3-register-message").textContent =
+    "Registration information validated. Secure server upload and verification are still required.";
+};
+
+window.br3Status = function() {
+  const status = document.getElementById("br3-status").value;
+  document.getElementById("br3-status-message").textContent =
+    "Selected status: " + status.toUpperCase() +
+    ". Actual driver availability requires backend connection.";
+};
+
+window.br3Star = function(value) {
+  selectedRating = value;
+  document.getElementById("br3-rating").textContent =
+    "Selected Rating: " + value + " / 5 stars";
+};
+
+window.br3Review = function() {
+  const review = document.getElementById("br3-review").value.trim();
+
+  document.getElementById("br3-review-message").textContent =
+    selectedRating && review
+      ? "Rating prepared. Submit to the server after a completed booking."
+      : "Select stars and write a review first.";
+};
+
+window.br3Complaint = function() {
+  const complaint = document.getElementById("br3-complaint").value.trim();
+  const category = document.getElementById("br3-category").value;
+
+  document.getElementById("br3-complaint-message").textContent =
+    complaint
+      ? "Complaint prepared: " + category +
+        ". Secure complaint submission requires backend."
+      : "Please describe your complaint.";
+};
+
+window.br3SOS = function() {
+  document.getElementById("br3-sos-message").textContent =
+    "SOS demo only. No emergency alert has been sent. " +
+    "Real SOS requires a verified emergency service and contact integration.";
+};
+})();
+</script>
+ </section>
+ 
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BR Cab - Customer Registration</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:linear-gradient(135deg,#071d3b,#0877c9);
+ min-height:100vh;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:18px;
+}
+.register-box{
+ width:100%;
+ max-width:420px;
+ background:white;
+ padding:28px;
+ border-radius:18px;
+ box-shadow:0 8px 30px #0004;
+}
+.logo{
+ text-align:center;
+ font-size:30px;
+ font-weight:bold;
+ color:#0755a5;
+}
+h2{text-align:center;color:#222}
+.subtitle{text-align:center;color:#777;font-size:14px}
+input{
+ width:100%;
+ padding:14px;
+ margin:9px 0;
+ border:1px solid #ccc;
+ border-radius:9px;
+ font-size:15px;
+}
+button{
+ width:100%;
+ padding:14px;
+ margin-top:12px;
+ background:#0755a5;
+ color:white;
+ border:0;
+ border-radius:9px;
+ font-size:17px;
+ font-weight:bold;
+ cursor:pointer;
+}
+button:hover{background:#043d7c}
+.login{text-align:center;margin-top:20px;font-size:14px}
+.login a{color:#0755a5;text-decoration:none;font-weight:bold}
+.message{text-align:center;margin-top:12px;font-size:14px}
+</style>
+</head>
+
+<body>
+<div class="register-box">
+
+<div class="logo">BR CAB</div>
+<h2>Customer Registration</h2>
+<p class="subtitle">अपना अकाउंट बनाएं और सफर शुरू करें</p>
+
+<form id="customerForm">
+
+<input type="text" id="customerName"
+placeholder="पूरा नाम" required>
+
+<input type="tel" id="customerPhone"
+placeholder="10 अंकों का मोबाइल नंबर"
+pattern="[0-9]{10}" maxlength="10" required>
+
+<input type="email" id="customerEmail"
+placeholder="ईमेल (वैकल्पिक)">
+
+<input type="password" id="customerPassword"
+placeholder="पासवर्ड बनाएं (कम से कम 8 अक्षर)"
+minlength="8" required>
+
+<input type="password" id="confirmPassword"
+placeholder="पासवर्ड दोबारा डालें"
+minlength="8" required>
+
+<button type="submit">Create Account</button>
+
+</form>
+
+<div class="message" id="message"></div>
+
+<div class="login">
+पहले से अकाउंट है?
+<a href="customer-login.html">Login करें</a>
+</div>
+
+</div>
+
+<script>
+document.getElementById("customerForm").addEventListener("submit",function(e){
+ e.preventDefault();
+
+ const name=document.getElementById("customerName").value.trim();
+ const phone=document.getElementById("customerPhone").value.trim();
+ const password=document.getElementById("customerPassword").value;
+ const confirm=document.getElementById("confirmPassword").value;
+ const message=document.getElementById("message");
+
+ if(password!==confirm){
+  message.style.color="red";
+  message.textContent="दोनों पासवर्ड एक जैसे नहीं हैं।";
+  return;
+ }
+
+ message.style.color="#0755a5";
+ message.textContent="फॉर्म तैयार है। असली अकाउंट बनाने के लिए सुरक्षित Backend जोड़ना बाकी है।";
+});
+ 
 </script>
 </body>
   </html>
