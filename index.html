@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BR CAB - Apna Bihar Apni Sawari</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f2f4f7;color:#172033}
+header{background:#101c32;color:white;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:9px;font-weight:bold}
+.emblem{height:42px;width:42px;border:2px solid #e8b75d;border-radius:50%;display:grid;place-items:center;color:#f3c66d;font-size:19px}
+.logo small{display:block;font-size:9px;color:#e8c98c;letter-spacing:2px}
+header span{font-size:10px;color:#f3c66d}
+.hero{padding:22px 16px;color:white;background:linear-gradient(90deg,#101c32eF,#101c3260),url('https://commons.wikimedia.org/wiki/Special:FilePath/Rajgir_Glass_Bridge.jpg') center/cover}
+.hero h1{font-size:27px}.hero p{font-size:13px;margin-top:6px}
+main{max-width:1000px;margin:auto;padding:12px}
+.heading{display:flex;justify-content:space-between;align-items:center;margin:5px 0 10px}
+.heading h2{font-size:16px}.heading small{color:#68758a}
+.services{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.service{height:112px;position:relative;border:2px solid transparent;border-radius:12px;overflow:hidden;color:white;text-align:left;cursor:pointer;background:#23344c}
+.service.active{border-color:#e8b75d}
+.service .bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.62)}
+.service:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#081426aa,transparent)}
+.service img{position:absolute;z-index:1;right:2px;bottom:3px;width:68%;height:72%;object-fit:contain;object-position:right bottom}
+.service b,.service small{position:absolute;z-index:2;left:7px;text-shadow:0 2px 4px #000}
+.service b{top:8px;font-size:11px}.service small{bottom:7px;font-size:8px}
+.panel{background:white;border-radius:13px;padding:12px;margin-top:11px;box-shadow:0 3px 15px #17203312}
+.panel h2{font-size:15px;margin-bottom:9px}
+.field{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid #dce2eb;border-radius:9px;margin-bottom:7px}
+.field input{width:100%;border:0;outline:0;font-size:13px;min-width:0}
+.field button{border:0;padding:7px;border-radius:7px;background:#edf2fa}
+.distance-title{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:bold}
+#distanceValue{font-size:21px;color:#15945b}
+input[type=range]{width:100%;accent-color:#15945b;margin:10px 0}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.quick button{padding:8px 2px;border:1px solid #dce2eb;background:white;border-radius:7px;font-size:11px}
+.quick button.selected{background:#15945b;color:white;border-color:#15945b}
+.actions{display:flex;gap:7px;margin-top:9px}
+.actions button{flex:1;padding:11px 4px;border:0;border-radius:8px;font-weight:bold;font-size:11px}
+.mapbtn{background:#eaf1ff;color:#2056a7}
+.voicebtn{background:#fff0df;color:#995600}
+.ridebtn{background:#15945b;color:white}
+#map{height:210px;border-radius:10px;margin-top:10px;z-index:1}
+#status{font-size:11px;color:#16724d;margin-top:8px;min-height:16px}
+footer{text-align:center;padding:14px;color:#778196;font-size:10px}
+@media(max-width:420px){
+main{padding:8px}.service{height:100px}
+.service b{font-size:9px}.service small{font-size:7px}
+#map{height:185px}.panel{padding:9px}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">
+  <div class="emblem">BR</div>
+  <div>BR CAB<small>BIHAR • INDIA</small></div>
+ </div>
+ <span>APNA BIHAR • APNI SAWARI</span>
+</header>
+
+<section class="hero">
+ <h1>BR CAB</h1>
+ <p>अपना बिहार, अपनी सवारी</p>
+</section>
+
+<main>
+ <div class="heading">
+  <h2>अपनी सर्विस चुनें</h2>
+  <small>SELECT SERVICE</small>
+ </div>
+
+ <div class="services">
+  <button class="service active" data-service="Cab">
+   <div class="bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/d/d6/Patna_Golghar_2.jpg')"></div>
+   <b>CAR / CAB</b>
+   <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=500" alt="Car">
+   <small>राजगीर • बिहार</small>
+  </button>
+
+  <button class="service" data-service="Bus">
+   <div class="bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/d/d6/Patna_Golghar_2.jpg')"></div>
+   <b>BUS</b>
+   <img src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=500" alt="Bus">
+   <small>पटना • बिहार</small>
+  </button>
+
+  <button class="service" data-service="Patna Metro">
+   <div class="bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/d/d6/Patna_Golghar_2.jpg')"></div>
+   <b>PATNA METRO</b>
+   <img src="https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=500" alt="Metro">
+   <small>गोलघर • पटना</small>
+  </button>
+
+  <button class="service" data-service="Scooty">
+   <div class="bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/8/8f/Bodhgaya_3640450872_f4ec280187_t.jpg')"></div>
+   <b>SCOOTY</b>
+   <img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=500" alt="Scooter">
+   <small>बोधगया • बिहार</small>
+  </button>
+
+  <button class="service" data-service="Parcel">
+   <div class="bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/d/d6/Patna_Golghar_2.jpg')"></div>
+   <b>PARCEL</b>
+   <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=500" alt="Parcel">
+   <small>वैशाली • बिहार</small>
+  </button>
+
+  <button class="service" data-service="Local Delivery">
+   <div class="bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/8/8f/Bodhgaya_3640450872_f4ec280187_t.jpg')"></div>
+   <b>LOCAL DELIVERY</b>
+   <img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=500" alt="Delivery">
+   <small>नालंदा • बिहार</small>
+  </button>
+ </div>
+
+ <section class="panel">
+  <h2 id="bookingTitle">Cab बुक करें</h2>
+
+  <div class="field">
+   <span style="color:green">●</span>
+   <input id="pickup" placeholder="Pickup Location लिखें">
+   <button onclick="myLocation()">◎</button>
+  </div>
+
+  <div class="field">
+   <span style="color:red">●</span>
+   <input id="destination" placeholder="कहाँ जाना है?">
+   <button onclick="voiceSearch()">🎙</button>
+  </div>
+ </section>
+
+ <section class="panel">
+  <div class="distance-title">
+   <span>आप कितनी दूर जाना चाहते हैं?</span>
+   <span id="distanceValue">200 KM</span>
+  </div>
+  <input type="range" id="distance" min="5" max="500" step="5" value="200">
+  <div class="quick">
+   <button data-km="5">5 KM</button>
+   <button data-km="10">10 KM</button>
+   <button data-km="20">20 KM</button>
+   <button data-km="50">50 KM</button>
+   <button data-km="100">100 KM</button>
+   <button data-km="200" class="selected">200 KM</button>
+   <button data-km="300">300 KM</button>
+   <button data-km="500">500 KM</button>
+  </div>
+  <p style="font-size:10px;color:#68758a;margin-top:8px">
+   आप स्लाइडर या बटन से अपनी अधिकतम यात्रा दूरी कभी भी बदल सकते हैं।
+  </p>
+ </section>
+
+ <section class="panel">
+  <h2>अपना रास्ता चुनें</h2>
+  <div class="actions">
+   <button class="mapbtn" onclick="mapMode='pickup';say('मैप पर Pickup चुनें')">📍 PICKUP PIN</button>
+   <button class="mapbtn" onclick="mapMode='destination';say('मैप पर Destination चुनें')">📍 DROP PIN</button>
+  </div>
+  <div class="actions">
+   <button class="voicebtn" onclick="voiceSearch()">🎙 बोलकर खोजें</button>
+   <button class="ridebtn" onclick="findRoute()">FIND ROUTE</button>
+  </div>
+  <div id="map"></div>
+  <div id="status">सर्विस, दूरी और अपनी जगह चुनें।</div>
+ </section>
+</main>
+
+<footer>BR CAB • APNA BIHAR APNI SAWARI</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let selectedService="Cab";
+let mapMode="pickup";
+let pickupMarker=null,dropMarker=null,routeLine=null;
+
+const map=L.map("map").setView([25.5941,85.1376],7);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+ maxZoom:19,attribution:"© OpenStreetMap"
+}).addTo(map);
+
+function say(message){
+ document.getElementById("status").innerText=message;
+}
+
+document.querySelectorAll(".service").forEach(card=>{
+ card.onclick=()=>{
+  document.querySelectorAll(".service").forEach(x=>x.classList.remove("active"));
+  card.classList.add("active");
+  selectedService=card.dataset.service;
+  document.getElementById("bookingTitle").innerText=selectedService+" बुक करें";
+  say(selectedService+" चुनी गई।");
+ };
+});
+
+const slider=document.getElementById("distance");
+const distanceValue=document.getElementById("distanceValue");
+function setDistance(value){
+ slider.value=value;
+ distanceValue.innerText=value+" KM";
+ document.querySelectorAll("[data-km]").forEach(btn=>{
+  btn.classList.toggle("selected",Number(btn.dataset.km)===Number(value));
+ });
+}
+slider.oninput=()=>setDistance(slider.value);
+document.querySelectorAll("[data-km]").forEach(btn=>{
+ btn.onclick=()=>setDistance(btn.dataset.km);
+});
+
+async function reversePlace(lat,lon){
+ try{
+  let r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+  let d=await r.json();
+  return d.display_name||`${lat}, ${lon}`;
+ }catch(e){return `${lat}, ${lon}`;}
+}
+
+map.on("click",async e=>{
+ let lat=e.latlng.lat,lon=e.latlng.lng;
+ let place=await reversePlace(lat,lon);
+ if(mapMode==="pickup"){
+  if(pickupMarker)map.removeLayer(pickupMarker);
+  pickupMarker=L.marker([lat,lon]).addTo(map).bindPopup("Pickup").openPopup();
+  document.getElementById("pickup").value=place;
+  mapMode="destination";
+  say("अब DROP PIN चुनें।");
+ }else{
+  if(dropMarker)map.removeLayer(dropMarker);
+  dropMarker=L.marker([lat,lon]).addTo(map).bindPopup("Destination").openPopup();
+  document.getElementById("destination").value=place;
+  mapMode="pickup";
+  say("Destination चुना गया।");
+ }
+});
+
+function myLocation(){
+ if(!navigator.geolocation){say("GPS उपलब्ध नहीं है।");return;}
+ navigator.geolocation.getCurrentPosition(async pos=>{
+  let lat=pos.coords.latitude,lon=pos.coords.longitude;
+  if(pickupMarker)map.removeLayer(pickupMarker);
+  pickupMarker=L.marker([lat,lon]).addTo(map).bindPopup("Pickup").openPopup();
+  map.setView([lat,lon],15);
+  document.getElementById("pickup").value=await reversePlace(lat,lon);
+  say("आपकी Pickup Location चुनी गई।");
+ },()=>say("Location Permission दें।"),{enableHighAccuracy:true});
+}
+
+function voiceSearch(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){say("Voice Search इस ब्राउज़र में उपलब्ध नहीं है।");return;}
+ let rec=new SR();
+ rec.lang="hi-IN";
+ rec.onresult=e=>{
+  document.getElementById("destination").value=e.results[0][0].transcript;
+  say("जगह आवाज़ से दर्ज हुई।");
+ };
+ rec.onerror=()=>say("आवाज़ नहीं मिली। फिर कोशिश करें।");
+ rec.start();
+}
+
+async function findPlace(q){
+ let url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q="+encodeURIComponent(q);
+ let r=await fetch(url),d=await r.json();
+ if(!d.length)throw Error("जगह नहीं मिली");
+ return [Number(d[0].lat),Number(d[0].lon)];
+}
+
+async function findRoute(){
+ let p=document.getElementById("pickup").value.trim();
+ let d=document.getElementById("destination").value.trim();
+ let maxKm=Number(slider.value);
+ if(!p||!d){say("Pickup और Destination दोनों भरें।");return;}
+ say("रास्ता खोज रहे हैं...");
+ try{
+  let a=await findPlace(p),b=await findPlace(d);
+  let url=`https://router.project-osrm.org/route/v1/driving/${a[1]},${a[0]};${b[1]},${b[0]}?overview=full&geometries=geojson`;
+  let response=await fetch(url),data=await response.json();
+  if(!data.routes||!data.routes.length)throw Error("रास्ता नहीं मिला");
+  let route=data.routes[0];
+  let km=route.distance/1000;
+  if(km>maxKm){
+   say("यह यात्रा "+km.toFixed(1)+" KM है। आपकी चुनी हुई सीमा "+maxKm+" KM है। दूरी बढ़ाएँ।");
+   return;
+  }
+  if(pickupMarker)map.removeLayer(pickupMarker);
+  if(dropMarker)map.removeLayer(dropMarker);
+  if(routeLine)map.removeLayer(routeLine);
+  pickupMarker=L.marker(a).addTo(map).bindPopup("Pickup");
+  dropMarker=L.marker(b).addTo(map).bindPopup("Destination");
+  routeLine=L.geoJSON(route.geometry,{style:{color:"#15945b",weight:5}}).addTo(map);
+  map.fitBounds(routeLine.getBounds(),{padding:[20,20]});
+  say(selectedService+" • "+km.toFixed(1)+" KM • लगभग "+Math.round(route.duration/60)+" मिनट। यह दूरी आपकी "+maxKm+" KM सीमा में है।");
+ }catch(e){
+  say("जगह या रास्ता नहीं मिला। सही नाम लिखकर कोशिश करें।");
+ }
+}
+</script>
+</body>
+  </html>
+  
