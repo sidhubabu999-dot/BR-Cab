@@ -298,6 +298,226 @@ async function findRoute(){
   say("जगह या रास्ता नहीं मिला। सही नाम लिखकर कोशिश करें।");
  }
 }
+<section id="br-services">
+<style>
+#br-services {
+  font-family: Arial, sans-serif;
+  background: #f3f6fb;
+  color: #172033;
+  padding: 18px;
+  border-radius: 15px;
+}
+#br-services .br-box {
+  background: white;
+  padding: 16px;
+  margin: 14px 0;
+  border-radius: 13px;
+  box-shadow: 0 2px 8px #0001;
+}
+#br-services input,
+#br-services select {
+  width: 100%;
+  padding: 13px;
+  margin: 7px 0 13px;
+  border: 1px solid #ccd3df;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+#br-services button {
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #1456c0;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 4px;
+}
+#br-services .wide { width: 100%; }
+#br-services .active { background: #087b52; }
+#br-services .muted { color: #657087; font-size: 13px; }
+#br-services [hidden] { display: none !important; }
+</style>
+
+<div class="br-box">
+  <h2>🚕 BR Cab</h2>
+  <p>Travel Anywhere in India 🇮🇳</p>
+  <label>Select Language / भाषा चुनें</label>
+  <select id="br-lang">
+    <option>English</option>
+    <option>हिंदी</option>
+    <option>भोजपुरी</option>
+    <option>বাংলা</option>
+    <option>मराठी</option>
+    <option>தமிழ்</option>
+    <option>తెలుగు</option>
+    <option>മലയാളം</option>
+    <option>ગુજરાતી</option>
+    <option>ਪੰਜਾਬੀ</option>
+    <option>ಕನ್ನಡ</option>
+  </select>
+</div>
+
+<div class="br-box">
+  <h3>Choose Your Service</h3>
+  <button id="br-car-btn" class="active" onclick="brChoose('car')">🚘 CAR / CAB</button>
+  <button id="br-bus-btn" onclick="brChoose('bus')">🚌 BUS BOOKING</button>
+
+  <h3 id="br-heading">Book Your Car</h3>
+
+  <label>From / कहाँ से</label>
+  <input id="br-from" placeholder="Enter pickup city">
+
+  <label>To / कहाँ तक</label>
+  <input id="br-to" placeholder="Enter destination">
+
+  <label>Journey Date</label>
+  <input id="br-date" type="date">
+
+  <div id="br-car-options">
+    <label>Choose Car</label>
+    <select id="br-car-type">
+      <option>Mini</option>
+      <option>Sedan</option>
+      <option>SUV</option>
+      <option>Premium</option>
+    </select>
+  </div>
+
+  <div id="br-bus-options" hidden>
+    <label>Choose Bus</label>
+    <select id="br-bus-type">
+      <option>AC Seater</option>
+      <option>Non AC Seater</option>
+      <option>AC Sleeper</option>
+      <option>Non AC Sleeper</option>
+    </select>
+  </div>
+
+  <button class="wide" onclick="brSearch()">SEARCH / खोजें</button>
+  <p id="br-message" aria-live="polite"></p>
+  <p class="muted">Real vehicle availability, bus seats and fares require live booking provider integration.</p>
+</div>
+
+<div class="br-box">
+  <h3>👤 Customer Account</h3>
+  <button onclick="brShowLogin('Customer')">Customer Login</button>
+
+  <h3>🚕 Driver Account</h3>
+  <button onclick="brShowLogin('Driver')">Driver Login</button>
+
+  <div id="br-login" hidden>
+    <h3 id="br-login-heading"></h3>
+
+    <label>Full Name</label>
+    <input id="br-user-name" placeholder="Enter your name">
+
+    <label>Mobile Number</label>
+    <input id="br-user-phone" type="tel" maxlength="10" placeholder="10 digit mobile number">
+
+    <label>Password</label>
+    <input id="br-user-password" type="password" placeholder="Enter password">
+
+    <button class="wide" onclick="brLoginSubmit()">Continue</button>
+    <p id="br-login-message" aria-live="polite"></p>
+    <p class="muted">Account creation and secure OTP login require backend integration.</p>
+  </div>
+</div>
+
+<div class="br-box">
+  <h3>🇮🇳 Our Services</h3>
+  <p>🚘 All India Car Booking</p>
+  <p>🚌 All India Bus Booking</p>
+  <p>✈️ Airport Pickup & Drop</p>
+  <p>🚉 Railway Station Pickup</p>
+  <p>📍 Live Location Tracking</p>
+  <p>💬 Customer Support</p>
+</div>
+
+<script>
+(function() {
+  let service = "car";
+  let role = "Customer";
+
+  window.brChoose = function(type) {
+    service = type;
+
+    document.getElementById("br-car-options").hidden =
+      type !== "car";
+
+    document.getElementById("br-bus-options").hidden =
+      type !== "bus";
+
+    document.getElementById("br-heading").textContent =
+      type === "car" ? "Book Your Car" : "Book Your Bus";
+
+    document.getElementById("br-car-btn").classList.toggle(
+      "active", type === "car"
+    );
+
+    document.getElementById("br-bus-btn").classList.toggle(
+      "active", type === "bus"
+    );
+
+    document.getElementById("br-message").textContent = "";
+  };
+
+  window.brSearch = function() {
+    const from = document.getElementById("br-from").value.trim();
+    const to = document.getElementById("br-to").value.trim();
+    const date = document.getElementById("br-date").value;
+    const message = document.getElementById("br-message");
+
+    if (!from || !to || !date) {
+      message.textContent =
+        "Please enter pickup, destination and journey date.";
+      return;
+    }
+
+    if (from.toLowerCase() === to.toLowerCase()) {
+      message.textContent =
+        "Pickup and destination must be different.";
+      return;
+    }
+
+    const vehicle = service === "car"
+      ? document.getElementById("br-car-type").value
+      : document.getElementById("br-bus-type").value;
+
+    message.textContent =
+      service.toUpperCase() + " Search: " +
+      from + " → " + to +
+      " | " + date + " | " + vehicle +
+      ". Booking provider connection is required to show real results.";
+  };
+
+  window.brShowLogin = function(selectedRole) {
+    role = selectedRole;
+    document.getElementById("br-login").hidden = false;
+    document.getElementById("br-login-heading").textContent =
+      role + " Login";
+    document.getElementById("br-login-message").textContent = "";
+  };
+
+  window.brLoginSubmit = function() {
+    const name = document.getElementById("br-user-name").value.trim();
+    const phone = document.getElementById("br-user-phone").value.trim();
+    const password = document.getElementById("br-user-password").value;
+
+    const message = document.getElementById("br-login-message");
+
+    if (!name || !/^[0-9]{10}$/.test(phone) || !password) {
+      message.textContent = "Enter valid name, mobile number and password.";
+      return;
+    }
+
+    message.textContent =
+      "Login interface ready. Secure account authentication is not connected yet.";
+  };
+})();
+</script>
+</section>
+ 
 </script>
 </body>
   </html>
